@@ -60,8 +60,6 @@ def main
 #    browser.as(:href, AISLE_URL).first.click # Need to register and re-try
      
      browser.goto AISLE_URL # REMOVE THIS!
-     Watir::Wait.until{ 120 }
-
 
     browser.text_field(:name, "Register.ZipCode").set ZIPCODE
     browser.divs(:class, "btn btn-browseasguest").first.click
