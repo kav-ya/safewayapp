@@ -6,9 +6,10 @@ Safewayapp::Application.routes.draw do
    root 'aisles#index'
 
   # Example of regular route:
-  get 'aisles/' => 'aisles#index', as: 'aisles'
+  get 'aisles/' => 'aisles#index', as: 'allaisles'
   get 'aisles/index'
   get 'aisles/:id' => 'aisles#view', as: 'aisle'
+  #get 'products/:id' => 'catalog#view'
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
   #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase

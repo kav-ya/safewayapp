@@ -1,0 +1,13 @@
+<h1>Safeway Aisles</h1>
+ 
+<table>
+  <tr>
+    <th>Aisle</th>
+  </tr>
+ 
+  <% @aisles.each do |aisle| %>
+    <tr>
+      <td><%= link_to aisle.name, (aisle) %></td>
+    </tr>
+  <% end %>
+</table>
