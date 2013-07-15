@@ -48,7 +48,10 @@ AISLES_TABLE = DB[:aisles]
 PRODUCTS_TABLE = DB[:products]
 
 def main
-    browser = Watir::Browser.new :chrome
+    client = Selenium::WebDriver::Remote::Http::Default.new
+    client.timeout = 180 # seconds (default is 60)
+		
+    browser = Watir::Browser.new :chrome, :http_client=>client
 #    browser.goto SAFEWAY_URL # Watir waits
 
 #    browser.as(:href, GROCERY_URL).first.click
@@ -66,50 +69,51 @@ def main
 #    browser.as(:href, AISLE_URL).first.click
 
      browser.goto AISLE_URL # REMOVE THIS!
-     Watir::Wait.until { 120 }
 
      # MAKE 0!
-     #i_array = (1...NUM_AISLES).to_a
-     #i_array.each do |i|
-        #aid = AISLES_TABLE.insert(:name=>browser.frames[NAV_FRAME].as[i].text)
-	#puts "AID = ", aid	
+     i_array = (4...NUM_AISLES).to_a
+     i_array.each do |i|
+        aid = AISLES_TABLE.insert(:name=>browser.frames[NAV_FRAME].as[i].text)
+	puts "AID = ", aid	
 
-	i = 1
-	aid = 3
+	#i = 1
+	#aid = 3
 
 	# 2, 3
-	j_array = (5...AISLE_DICT[i]).to_a
-	#j_array = [4]
+	j_array = (2...AISLE_DICT[i]).to_a
+	#j_array = [6]
 	j_array.each do |j|
 	    k_array = (3...SUBAISLE_DICT[[i, j]]).to_a
 	    k_array.each do |k|
-	        browser.goto AISLE_URL
-		Watir::Wait.until{ 120 }
 
-		browser.frames[NAV_FRAME].as[i].click
+	        begin
+			browser.goto AISLE_URL
 
-             	Watir::Wait.until { browser.frames[NAV_FRAME].as.size ==
+			browser.frames[NAV_FRAME].as[i].click
+
+             		Watir::Wait.until { browser.frames[NAV_FRAME].as.size ==
 				    AISLE_DICT[i] }
-             	browser.frames[NAV_FRAME].as[j].click
-	
-		Watir::Wait.until{ 120 }
+             		browser.frames[NAV_FRAME].as[j].click
 
-		Watir::Wait.until { browser.frames[NAV_FRAME].as.size ==
+			Watir::Wait.until { browser.frames[NAV_FRAME].as.size ==
                                     SUBAISLE_DICT[[i, j]] }
-		browser.frames[NAV_FRAME].as[k].click
+			browser.frames[NAV_FRAME].as[k].click
 		    
-		puts "i, j, k = ", i, j, k
+			puts "i, j, k = ", i, j, k
 
-		Watir::Wait.until{ 120 }
-
-    		titles = browser.frames[MAIN_FRAME].tds(:id, "producttitle")
-    		prices = browser.frames[MAIN_FRAME].tds(:xpath,
+    			titles = browser.frames[MAIN_FRAME].tds(:id, "producttitle")
+    			prices = browser.frames[MAIN_FRAME].tds(:xpath,
 							"//font[@id='price']")
 
-		scrape_shelf(aid, titles, prices)
+			scrape_shelf(aid, titles, prices)
+		rescue Selenium::WebDriver::Error::StaleElementReferenceError
+		       puts "RETRYING"
+		       retry
+
+		end
 	    end
         end 
-    #end
+    end
 end
 
 def scrape_shelf(aislenum, titles, prices)

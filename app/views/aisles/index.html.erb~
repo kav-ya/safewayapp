@@ -1,13 +1,14 @@
-<h1>Safeway Aisles</h1>
+<h1>Safeway Storefront</h1>
  
+<h2>Aisles</h2>
 <table>
   <tr>
-    <th>Aisle</th>
+    <th></th>
   </tr>
  
   <% @aisles.each do |aisle| %>
     <tr>
-      <td><%= link_to aisle.name, 'aisle.id' %></td>
+      <td><%= link_to aisle.name, (aisle) %></td>
     </tr>
   <% end %>
 </table>
