@@ -32,12 +32,19 @@ SUBAISLE_DICT =
 [11, 2]=>13, [11, 3]=>4, [11, 4]=>32, [11, 5]=>5, [11, 6]=>6, [11, 7]=>5,
 [11, 8]=>6, [11, 9]=>5, [12, 2]=>9, [12, 3]=>11, [12, 4]=>6, [13, 2]=>8,
 [13, 3]=>11, [13, 4]=>4, [13, 5]=>10, [14, 2]=>10, [14, 3]=>7, [14, 4]=>8,
-[14, 5]=>6, [14, 6]=>9, [14, 7]=>8, [14, 8]=>9, [14, 9]=>7, [15, 2]=>12,
-[15, 3]=>16, [15, 4]=>8, [15, 5]=>7, [15, 6]=>9, [15, 7]=>8, [15, 8]=>12,
+[14, 5]=>6, [14, 6]=>9, [14, 7]=>8, [14, 8]=>9, [14, 9]=>7,
+
+[15, 2]=>12, [15, 3]=>16,
+
+[15, 4]=>8, [15, 5]=>7, [15, 6]=>9, [15, 7]=>8, [15, 8]=>12,
 [15, 9]=>7, [15, 10]=>11, [15, 11]=>13, [16, 2]=>16, [16, 3]=>13, [16, 4]=>8,
 [16, 5]=>7, [16, 6]=>5, [16, 7]=>8, [16, 8]=>6, [16, 9]=>7, [16, 10]=>11,
 [16, 11]=>4, [16, 12]=>8, [16, 13]=>16, [16, 14]=>12, [16, 15]=>6, [16, 16]=>13,
-[16, 17]=>21, [16, 18]=>19, [17, 2]=>8, [17, 3]=>7, [17, 4]=>4, [18, 2]=>5,
+[16, 17]=>21,
+
+[16, 18]=>19,
+
+[17, 2]=>8, [17, 3]=>7, [17, 4]=>4, [18, 2]=>5,
 [19, 2]=>10, [19, 3]=>5, [19,4]=>18, [19, 5]=>9, [19, 6]=>12, [19, 7]=>13}
 
 # Connect to DB, get tables
@@ -71,35 +78,44 @@ def main
 #     browser.goto AISLE_URL # REMOVE THIS!
 
      # MAKE 0!
-     i_array = (6...NUM_AISLES).to_a
+     i_array = (17...NUM_AISLES).to_a
      i_array.each do |i|
         browser.goto AISLE_URL
         aid = AISLES_TABLE.insert(:name=>browser.frames[NAV_FRAME].as[i].text)
         puts "AID = ", aid	
 
-	    #i = 1
-	    #aid = 3
+	    #i = 16
+	    #aid = 19
 
 	    # 2, 3
 	    j_array = (2...AISLE_DICT[i]).to_a
-	    #j_array = [6]
+	    #j_array = [18]
 	    j_array.each do |j|
 	        k_array = (3...SUBAISLE_DICT[[i, j]]).to_a
-	        k_array.each do |k|
+            #k_array = [19]
+            k_array.each do |k|
 
 	            begin
 			        browser.goto AISLE_URL
 
+                    puts "HERE"
 			        browser.frames[NAV_FRAME].as[i].click
 
+                    puts "HERE 2"
              		Watir::Wait.until { browser.frames[NAV_FRAME].as.size ==
 				    AISLE_DICT[i] }
              		browser.frames[NAV_FRAME].as[j].click
 
-			        Watir::Wait.until { browser.frames[NAV_FRAME].as.size ==
-                                    SUBAISLE_DICT[[i, j]] }
+
+                    puts "HERE 3"
+                    puts "i, j =", i, j
+                    puts "entry = ", SUBAISLE_DICT[[i,j]]
+			        #Watir::Wait.until { browser.frames[NAV_FRAME].as.size ==
+                    #                SUBAISLE_DICT[[i, j]] }
 			        browser.frames[NAV_FRAME].as[k].click
 		    
+
+                    puts "HERE 4"
 			        puts "i, j, k = ", i, j, k
 
     			    titles = browser.frames[MAIN_FRAME].tds(:id, "producttitle")

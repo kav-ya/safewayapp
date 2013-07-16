@@ -14,7 +14,8 @@ NAV_FRAME = 1
 MAIN_FRAME = 2
 
 class SafewayIndexGenerator
-    def initialize    
+    def initialize
+        # Open Watir browser    
         @client = Selenium::WebDriver::Remote::Http::Default.new
         @client.timeout = 180 # seconds (default is 60)
 
