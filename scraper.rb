@@ -21,7 +21,7 @@ MAIN_FRAME = 2
 NUM_AISLES = 20
 AISLE_DICT = [6, 7, 5, 4, 7, 12, 7, 7, 7, 3, 9, 10, 5, 6, 10, 12, 19, 5, 3, 8]
 SUBAISLE_DICT =
-{[0, 2]=>8, [0, 3]=>8, [0, 4]=>13, [0, 5]=>13, [1, 2]=>12, [1, 3]=>13,
+{[0, 2]=>6, [0, 3]=>8, [0, 4]=>13, [0, 5]=>13, [1, 2]=>12, [1, 3]=>13,
 [1, 4]=>18, [1, 5]=>13, [1, 6]=>11, [2, 2]=>11, [2, 3]=>9, [2, 4]=>10,
 [3, 2]=>8, [3, 3]=>8, [4, 2]=>12, [4, 3]=>11, [4, 4]=>10, [4, 5]=>23, [4, 6]=>10,
 [5, 2]=>16, [5, 3]=>18, [5, 4]=>9, [5, 5]=>5, [5, 6]=>9, [5, 7]=>9, [5, 8]=>9,
@@ -61,7 +61,7 @@ class SafewayScraper
 
         @browser.as(:href, GROCERY_URL).first.click
         @browser.window(:title, GROCERY_TITLE).wait_until_present
-        url = browser.window(:title, GROCERY_TITLE).url
+        url = @browser.window(:title, GROCERY_TITLE).url
         @browser.window(:title, GROCERY_TITLE).close
         @browser.goto url
 
@@ -73,6 +73,7 @@ class SafewayScraper
     end
 
     def scrape
+
         (0...NUM_AISLES).to_a.each do |i|
             @browser.goto AISLE_URL
             aid = @aisles_table.insert(:name=>@browser.frames[NAV_FRAME].as[i].text)
@@ -82,13 +83,17 @@ class SafewayScraper
 	                begin
 			            @browser.goto AISLE_URL
 			            @browser.frames[NAV_FRAME].as[i].click
+                        
+                        puts "i, j, AISLE_DICT[i] =", i, j, AISLE_DICT[i]
 
              		    Watir::Wait.until { @browser.frames[NAV_FRAME].as.size ==
                                              AISLE_DICT[i] }
              		    @browser.frames[NAV_FRAME].as[j].click
 
-			            Watir::Wait.until { @browser.frames[NAV_FRAME].as.size ==
-                                        SUBAISLE_DICT[[i, j]] }
+                        puts "k, entry = ", k, SUBAISLE_DICT[[i,j]]
+
+			            Watir::Wait.until { @browser.frames[NAV_FRAME].as.size #>= 3 }
+                                            SUBAISLE_DICT[[i, j]] }
 			            @browser.frames[NAV_FRAME].as[k].click
     
         			    titles = @browser.frames[MAIN_FRAME].tds(:id, "producttitle")
@@ -98,7 +103,7 @@ class SafewayScraper
 	    		        scrape_shelf(aid, titles, prices)
 
 		            rescue Selenium::WebDriver::Error::StaleElementReferenceError
-		                    retry
+		                retry
 	    	        end
 	            end
             end 
@@ -109,7 +114,7 @@ class SafewayScraper
         (0...titles.size).to_a.each do |i|
 	        @products_table.insert(:title=>titles[i].text, :price=>prices[i].text,
 		                	      :aisle_id=>aislenum)
-        end
+            end
     end
 end
 
