@@ -73,13 +73,14 @@ class SafewayIndexGenerator
 	        end
         end
 
+        @browser.close
         return @num_aisles, @aisle_dict, @subaisle_dict
     end
 end
 
 generator = SafewayIndexGenerator.new
 generator.goto_aisles
-numaisles, aisledict, subaisledict = generator.generate_indexes
+numaisles, aisledict, subaisledict = generator.generate_indexes # Closes browser
 
 puts numaisles
 puts aisledict

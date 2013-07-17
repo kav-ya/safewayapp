@@ -108,6 +108,8 @@ class SafewayScraper
 	            end
             end 
         end
+
+        @browser.close
     end
 
     def scrape_shelf(aislenum, titles, prices)
@@ -120,6 +122,6 @@ end
 
 scraper = SafewayScraper.new
 scraper.goto_aisles
-scraper.scrape
+scraper.scrape # Closes browser
 
 puts DONE
