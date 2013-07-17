@@ -39,26 +39,41 @@ class SafewayIndexGenerator
     end
 
     def generate_indexes
-        num_aisles = @browser.frames[NAV_FRAME].as.size
-        aisle_dict = Array.new(num_aisles)
-        subaisle_dict = Hash.new
-
-        (0...num_aisles).to_a.each do |i|
+        @num_aisles = @browser.frames[NAV_FRAME].as.size
+        
+        @aisle_dict = Array.new(@num_aisles)
+        @subaisle_dict = Hash.new
+        (0...@num_aisles).to_a.each do |i|
             @browser.goto AISLE_URL
-	        @browser.frames[NAV_FRAME].as[i].click
-	        num_subaisles = @browser.frames[NAV_FRAME].as.size
-     	    aisle_dict[i] = num_subaisles
 
-            (2...aisle_dict[i]).to_a.each do |j|
-                @browser.goto AISLE_URL
-	            @browser.frames[NAV_FRAME].as[i].click
-	            @browser.frames[NAV_FRAME].as[j].click
-	            num_shelfs = @browser.frames[NAV_FRAME].as.size
-	            subaisle_dict[[i, j]] = num_shelfs
+            Watir::Wait.until { @browser.frames[NAV_FRAME].as.size ==
+                                @num_aisles }	        
+            @browser.frames[NAV_FRAME].as[i].click
+	        num_subaisles = @browser.frames[NAV_FRAME].as.size
+     	    @aisle_dict[i] = num_subaisles
+
+            (2...@aisle_dict[i]).to_a.each do |j|
+                begin
+                    @browser.goto AISLE_URL
+                
+                    Watir::Wait.until { @browser.frames[NAV_FRAME].as.size ==
+                                        @num_aisles }
+                    @browser.frames[NAV_FRAME].as[i].click
+                
+                    Watir::Wait.until { @browser.frames[NAV_FRAME].as.size ==
+                                        @aisle_dict[i] }
+	                @browser.frames[NAV_FRAME].as[j].click
+
+	                num_shelfs = @browser.frames[NAV_FRAME].as.size
+	                @subaisle_dict[[i, j]] = num_shelfs
+
+                rescue Selenium::WebDriver::Error::StaleElementReferenceError
+                    retry
+                end
 	        end
         end
 
-        return num_aisles, aisle_dict, subaisle_dict
+        return @num_aisles, @aisle_dict, @subaisle_dict
     end
 end
 

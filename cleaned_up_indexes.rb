@@ -18,7 +18,7 @@ class SafewayIndexGenerator
         @client = Selenium::WebDriver::Remote::Http::Default.new
         @client.timeout = 180 # seconds (default is 60)
 
-        @browser = Watir::Browser.new :chrome, :http_client=>client
+        @browser = Watir::Browser.new :chrome, :http_client=>@client
     end
     
     def goto_aisles
@@ -26,7 +26,7 @@ class SafewayIndexGenerator
 
         @browser.as(:href, GROCERY_URL).first.click
         @browser.window(:title, GROCERY_TITLE).wait_until_present
-        @url = browser.window(:title, GROCERY_TITLE).url
+        url = @browser.window(:title, GROCERY_TITLE).url
         @browser.window(:title, GROCERY_TITLE).close
         @browser.goto url
 
@@ -39,25 +39,44 @@ class SafewayIndexGenerator
 
     def generate_indexes
         @num_aisles = @browser.frames[NAV_FRAME].as.size
+
+        puts "num_aisles =", @num_aisles
         
-        @aisle_dict = Array.new(num_aisles)
-        (0...num_aisles).to_a.each do |i|
+        @aisle_dict = Array.new(@num_aisles)
+        (0...@num_aisles).to_a.each do |i|
             @browser.goto AISLE_URL
-	        @browser.frames[NAV_FRAME].as[i].click
+	        
+            Watir::Wait.until { @browser.frames[NAV_FRAME].as.size ==
+                                @num_aisles }
+            @browser.frames[NAV_FRAME].as[i].click
 	        num_subaisles = @browser.frames[NAV_FRAME].as.size
      	    @aisle_dict[i] = num_subaisles
         end
 
+        puts "aisle_dict = ", @aisle_dict
+
         @subaisle_dict = Hash.new
-        (0...num_aisles).to_a.each do |i|
-     	     (2...aisle_dict[i]).to_a.each do |j|
+        (0...@num_aisles).to_a.each do |i|
+     	     (2...@aisle_dict[i]).to_a.each do |j|
                 @browser.goto AISLE_URL
+
+                Watir::Wait.until { @browser.frames[NAV_FRAME].as.size ==
+                                    @num_aisles }
 	            @browser.frames[NAV_FRAME].as[i].click
+            
+                puts "here, j, aisle_dict[j] ="
+                puts j
+                puts @aisle_dict[j]
+
+                #Watir::Wait.until { @browser.frames[NAV_FRAME].as.size ==
+                #                    @aisle_dict[j] }
 	            @browser.frames[NAV_FRAME].as[j].click
 	            num_shelfs = @browser.frames[NAV_FRAME].as.size
 	            @subaisle_dict[[i, j]] = num_shelfs
 	        end
         end
+
+        puts "subaisle_dict = ", @subaisle_dict
 
         return @num_aisles, @aisle_dict, @subaisle_dict
     end
@@ -67,6 +86,6 @@ generator = SafewayIndexGenerator.new
 generator.goto_aisles
 numaisles, aisledict, subaisledict = generator.generate_indexes
 
-puts numaisles
-puts aisledict
-puts subaisledict
+#puts numaisles
+#puts aisledict
+#puts subaisledict

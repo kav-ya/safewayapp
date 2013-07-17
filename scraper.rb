@@ -32,34 +32,28 @@ SUBAISLE_DICT =
 [11, 2]=>13, [11, 3]=>4, [11, 4]=>32, [11, 5]=>5, [11, 6]=>6, [11, 7]=>5,
 [11, 8]=>6, [11, 9]=>5, [12, 2]=>9, [12, 3]=>11, [12, 4]=>6, [13, 2]=>8,
 [13, 3]=>11, [13, 4]=>4, [13, 5]=>10, [14, 2]=>10, [14, 3]=>7, [14, 4]=>8,
-[14, 5]=>6, [14, 6]=>9, [14, 7]=>8, [14, 8]=>9, [14, 9]=>7,
-
-[15, 2]=>12, [15, 3]=>16,
-
-[15, 4]=>8, [15, 5]=>7, [15, 6]=>9, [15, 7]=>8, [15, 8]=>12,
+[14, 5]=>6, [14, 6]=>9, [14, 7]=>8, [14, 8]=>9, [14, 9]=>7, [15, 2]=>7,
+[15, 3]=>16, [15, 4]=>8, [15, 5]=>7, [15, 6]=>9, [15, 7]=>8, [15, 8]=>12,
 [15, 9]=>7, [15, 10]=>11, [15, 11]=>13, [16, 2]=>16, [16, 3]=>13, [16, 4]=>8,
 [16, 5]=>7, [16, 6]=>5, [16, 7]=>8, [16, 8]=>6, [16, 9]=>7, [16, 10]=>11,
 [16, 11]=>4, [16, 12]=>8, [16, 13]=>16, [16, 14]=>12, [16, 15]=>6, [16, 16]=>13,
-[16, 17]=>21,
-[16, 18]=>19,
-
-[17, 2]=>8, [17, 3]=>7, [17, 4]=>4, [18, 2]=>5,
+[16, 17]=>21, [16, 18]=>19, [17, 2]=>8, [17, 3]=>7, [17, 4]=>4, [18, 2]=>5,
 [19, 2]=>10, [19, 3]=>5, [19,4]=>18, [19, 5]=>9, [19, 6]=>12, [19, 7]=>13}
 
 class SafewayScraper
     def initialize
         # Connect to DB, get tables
-        db = Sequel.connect(:adapter=>'postgres', :host=>'localhost',
+        @db = Sequel.connect(:adapter=>'postgres', :host=>'localhost',
                             :database=>'safewayapp_development', :user=>'kavya',
 			    			:password=>'')
-        aisles_table = db[:aisles]
-        products_table = db[:products]
+        @aisles_table = @db[:aisles]
+        @products_table = @db[:products]
  
         # Open Watir browser
         @client = Selenium::WebDriver::Remote::Http::Default.new
         @client.timeout = 180 # seconds (default is 60)
 		
-        @browser = Watir::Browser.new :chrome, :http_client=>client
+        @browser = Watir::Browser.new :chrome, :http_client=>@client
     end
 
     def goto_aisles
